@@ -16,7 +16,7 @@ func fetchLinks() ([]string, error) {
 	rt := []string{}
 
 	for _, rawurl := range configs.Data.MS["vietnamplus"].URL {
-		links, err := getLinks(rawurl)
+		links, err := getLinksRss(rawurl)
 		if err != nil {
 			return nil, err
 		}
@@ -49,7 +49,7 @@ func getLinksRss(rawurl string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if links, err := exhtml.ExtractRss(u.String()); err != nil {
+	if links, err := exhtml.ExtractRssGuids(u.String()); err != nil {
 		return nil, errors.WithMessagef(err, "[%s] cannot extract links from %s",
 			configs.Data.MS["vietnamplus"].Title, rawurl)
 	} else {
