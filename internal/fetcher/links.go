@@ -49,12 +49,20 @@ func getLinksRss(rawurl string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if links, err := exhtml.ExtractRssGuids(u.String()); err != nil {
+	links, err := exhtml.ExtractRssGuids(u.String())
+	if err != nil {
 		return nil, errors.WithMessagef(err, "[%s] cannot extract links from %s",
 			configs.Data.MS["vietnamplus"].Title, rawurl)
-	} else {
-		return gears.StrSliceDeDupl(links), nil
 	}
+	links = gears.StrSliceDeDupl(links)
+	links = kickOutLinksMatchPath(links, "图表新闻")
+	re := regexp.MustCompile(`https://zh.vietnamplus.vn/.+/(?P<guid>\d+).vnp`)
+	links2 := []string{}
+	for _, link := range links {
+		rs := re.ReplaceAllString(link, "https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=${guid}")
+		links2 = append(links2, rs)
+	}
+	return links2, nil
 }
 
 func getLinks(rawurl string) ([]string, error) {
