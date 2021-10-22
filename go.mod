@@ -3,7 +3,7 @@ module github.com/hi20160616/ms-vietnamplus
 go 1.17
 
 require (
-	github.com/hi20160616/exhtml v0.0.0-20211022030625-513bf4d98c02
+	github.com/hi20160616/exhtml v0.0.0-20211022044723-94ab98a3a1fc
 	github.com/hi20160616/fetchnews-api v0.0.0-20210527092959-c7f6971039c7
 	github.com/hi20160616/gears v0.0.0-20211011123823-9336c3913d20
 	github.com/hycka/gocc v0.0.0-20210322081417-5d0705989987

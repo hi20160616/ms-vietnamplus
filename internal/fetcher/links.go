@@ -56,6 +56,7 @@ func getLinksRss(rawurl string) ([]string, error) {
 	}
 	links = gears.StrSliceDeDupl(links)
 	links = kickOutLinksMatchPath(links, "图表新闻")
+	links = kickOutLinksMatchPath(links, "组图")
 	re := regexp.MustCompile(`https://zh.vietnamplus.vn/.+/(?P<guid>\d+).vnp`)
 	links2 := []string{}
 	for _, link := range links {

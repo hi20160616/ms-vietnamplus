@@ -14,8 +14,8 @@ func TestFetchTitle(t *testing.T) {
 		url   string
 		title string
 	}{
-		{"https://tw.vietnamplus.com/local/20211015/EJNCNTZMQVE5TE2PHRHB5MN3HY/", "K律師論點｜城中城大火若是人禍　究責關鍵先釐清這事"},
-		{"https://tw.vietnamplus.com/politics/20211012/GTRJUAUOXBAUXIIQZEAR72XHSI/", "網傳綠營大老舔共文　讚「兩岸只有親情和恩情」？當事人說話了"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=147665", "越南与联合国安理会：越南支持妇女对维持和建设和平的作用"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=143985", "德国马恩基金会主席：越共中央总书记阮富仲署名文章指明越南走向社会主义的道路"},
 	}
 	for _, tc := range tests {
 		a := NewArticle()
@@ -50,8 +50,8 @@ func TestFetchUpdateTime(t *testing.T) {
 		url  string
 		want string
 	}{
-		{"https://tw.vietnamplus.com/local/20211015/EJNCNTZMQVE5TE2PHRHB5MN3HY/", "2021-10-15 16:13:47.476 +0800 UTC"},
-		{"https://tw.vietnamplus.com/politics/20211012/GTRJUAUOXBAUXIIQZEAR72XHSI/", "2021-10-12 20:36:20.657 +0800 UTC"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=147665", "2021-10-22 16:35:00 +0800 UTC"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=143985", "2021-08-10 19:09:00 +0800 UTC"},
 	}
 	var err error
 	for _, tc := range tests {
@@ -84,9 +84,8 @@ func TestFetchContent(t *testing.T) {
 		url  string
 		want string
 	}{
-		{"https://tw.vietnamplus.com/property/20211021/2ICEHGCCWRFNXOLYWGGHGEIJDA/", "K律師論點｜城中城大火若是人禍　究責關鍵先釐清這事"},
-		{"https://tw.vietnamplus.com/local/20211015/EJNCNTZMQVE5TE2PHRHB5MN3HY/", "K律師論點｜城中城大火若是人禍　究責關鍵先釐清這事"},
-		{"https://tw.vietnamplus.com/politics/20211012/GTRJUAUOXBAUXIIQZEAR72XHSI/", "網傳綠營大老舔共文　讚「兩岸只有親情和恩情」？當事人說話了"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=147665", "越南与联合国安理会：越南支持妇女对维持和建设和平的作用"},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=143985", "德国马恩基金会主席：越共中央总书记阮富仲署名文章指明越南走向社会主义的道路"},
 	}
 	var err error
 
@@ -114,8 +113,8 @@ func TestFetchArticle(t *testing.T) {
 		url string
 		err error
 	}{
-		{"https://tw.vietnamplus.com/local/20211015/EJNCNTZMQVE5TE2PHRHB5MN3HY/", ErrTimeOverDays},
-		{"https://tw.vietnamplus.com/property/20211021/2ICEHGCCWRFNXOLYWGGHGEIJDA/", nil},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=147665", ErrTimeOverDays},
+		{"https://zh.vietnamplus.vn/Utilities/Print.aspx?contentid=143985", nil},
 	}
 	for _, tc := range tests {
 		a := NewArticle()

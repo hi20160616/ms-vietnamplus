@@ -176,7 +176,7 @@ func (a *Article) fetchTitle() (string, error) {
 			configs.Data.MS["vietnamplus"].Title)
 	}
 	title := n[0].FirstChild.Data
-	rp := strings.NewReplacer(" ｜ 蘋果新聞網 ｜ 蘋果日報", "")
+	rp := strings.NewReplacer("Bản in : ", "", " | Vietnam+ (VietnamPlus)", "")
 	title = strings.TrimSpace(rp.Replace(title))
 	return gears.ChangeIllegalChar(title), nil
 }
@@ -189,15 +189,16 @@ func (a *Article) fetchUpdateTime() (*timestamppb.Timestamp, error) {
 
 	t := time.Now() // if no time fetched, return current time
 	var err error
-	n := exhtml.MetasByProperty(a.doc, "article:published_time")
+	n := exhtml.TagWithAttr(a.doc, "time", "datetime")
 	if len(n) == 0 {
-		return nil, fmt.Errorf("[%s] fetchUpdateTime error, no meta named date matched: %s",
+		return nil, fmt.Errorf("[%s] fetchUpdateTime error, no tag matched: %s",
 			configs.Data.MS["vietnamplus"].Title, a.U.String())
 	}
 	for _, nn := range n {
 		for _, x := range nn.Attr {
-			if x.Key == "content" {
-				t, err = time.Parse(time.RFC3339, x.Val)
+			if x.Key == "datetime" {
+				// t, err = time.Parse(time.RFC3339, x.Val)
+				t, err = time.Parse("2006-01-02 15:04", x.Val)
 				if err != nil {
 					return nil, errors.WithMessage(err,
 						"caught meta but no content matched.")
