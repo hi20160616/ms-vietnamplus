@@ -42,6 +42,12 @@ func fetch(ctx context.Context) (as []*Article, err error) {
 	if err != nil {
 		return
 	}
+	if configs.Data.Debug {
+		log.Printf("fetch links(%d): \n", len(links))
+		for _, link := range links {
+			log.Println(link)
+		}
+	}
 	for _, link := range links {
 		select {
 		case <-ctx.Done():
