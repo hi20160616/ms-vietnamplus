@@ -1,9 +1,10 @@
 package fetcher
 
 import (
+	"bytes"
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/url"
 	"regexp"
@@ -222,47 +223,38 @@ func (a *Article) fetchContent() (string, error) {
 	if a.doc == nil {
 		return "", errors.Errorf("[%s] fetchContent: doc is nil: %s", configs.Data.MS["vietnamplus"].Title, a.U.String())
 	}
-	body := ""
-	bodyN := exhtml.ElementsByTagAndId(a.doc, "script", "fusion-metadata")
-	if len(bodyN) == 0 {
-		return body, errors.Errorf("no article content matched: %s", a.U.String())
-	}
-	// Fetch content
-	bodyJs := func() string {
-		for _, v := range bodyN {
+	// This summary part is likely to be same as 1st part of main content.
+	summary := func() string {
+		n := exhtml.ElementsByTagAndClass(a.doc, "div", "details__summary cms-desc")
+		for _, v := range n {
 			if v.FirstChild != nil && v.FirstChild.Type == html.TextNode {
-				return v.FirstChild.Data
+				return "> " + strings.TrimSpace(v.FirstChild.Data) + "  \n"
 			}
 		}
 		return ""
 	}()
 
-	re := regexp.MustCompile(`(?m)Fusion\.globalContent=(?P<x>.*?);Fusion.globalContentConfig={"source":"`)
-	if !re.MatchString(bodyJs) {
-		return "", fmt.Errorf("nil content matched: %s", a.U.String())
+	// Fetch content
+	n := exhtml.ElementsByTagAndClass(a.doc, "div", "content article-body")
+	contentN := &html.Node{}
+	for _, v := range n {
+		contentN = v
 	}
-	rs := re.FindStringSubmatch(bodyJs)
-	c := struct {
-		Content_elements []struct {
-			Content string `json:"content"`
-		} `json:"content_elements"`
-	}{}
-	if err := json.Unmarshal([]byte(rs[1]), &c); err != nil {
-		return "", err
+	exhtml.ElementsRmByTagClass(contentN, "div", "article-photo")
+	exhtml.ElementsRmByTagClass(contentN, "div", "cms-author")
+	// node to buf
+	var buf bytes.Buffer
+	w := io.Writer(&buf)
+	if err := html.Render(w, contentN); err != nil {
+		return "", errors.WithMessagef(err, "node render to bytes fail: %s", a.U.String())
 	}
+	// filter
+	re := regexp.MustCompile(`<div.*?>`)
+	body := re.ReplaceAllString(buf.String(), "")
+	repl := strings.NewReplacer(`</div>`, "", `<br/>`, "  \n")
+	body = repl.Replace(body)
 
-	for _, v := range c.Content_elements {
-		re := regexp.MustCompile(`(?m)<mark .*?>(?P<x>.*?)</mark>`)
-		x := re.ReplaceAllString(v.Content, "${x}")
-		re = regexp.MustCompile(`(?m)<b>(?P<x>.*?)</b>`)
-		x = re.ReplaceAllString(x, "**${x}**")
-		re = regexp.MustCompile(`(?m)<a href="(?P<href>.*?)">(?P<x>.*?)</a>`)
-		x = re.ReplaceAllString(x, "[${x}](${href})")
-		x = strings.ReplaceAll(x, "「", "“")
-		x = strings.ReplaceAll(x, "」", "”")
-		body += x + "  \n"
-	}
-	return body, nil
+	return summary + body, nil
 }
 
 func (a *Article) fmtContent(body string) (string, error) {
